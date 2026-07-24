@@ -1,5 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { explainIngredient } from "../services/ingredientApi";
 import {
   FaArrowLeft,
   FaShieldAlt,
@@ -15,6 +17,11 @@ import {
 function Result() {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const [selectedIngredient, setSelectedIngredient] = useState(null);
+const [modalOpen, setModalOpen] = useState(false);
+const [ingredientInfo, setIngredientInfo] = useState(null);
+const [loadingIngredient, setLoadingIngredient] = useState(false);
+const [showAllIngredients, setShowAllIngredients] = useState(false);
 
   if (!state) {
     return (
@@ -28,6 +35,28 @@ function Result() {
       </div>
     );
   }
+const openIngredient = async (ingredient) => {
+
+  setSelectedIngredient(ingredient);
+  setModalOpen(true);
+
+  setLoadingIngredient(true);
+
+  try {
+
+    const data = await explainIngredient(ingredient);
+
+    setIngredientInfo(data);
+
+  } catch {
+
+    setIngredientInfo("Unable to fetch ingredient details.");
+
+  }
+
+  setLoadingIngredient(false);
+
+};
 
   const {
     productName,
@@ -42,6 +71,101 @@ function Result() {
     nutrition,
     healthInsights,
   } = state;
+
+  const getHealthTip = () => {
+
+  if (healthScore >= 85) {
+    return {
+      title: "🌟 Excellent Choice",
+      color: "green",
+      message:
+        "This product is a healthy choice and can be included in your diet in moderation.",
+
+      eat: [
+        "🥗 Fresh vegetables",
+        "🍎 Seasonal fruits",
+        "🥛 Low-fat dairy",
+        "🌾 Whole grains"
+      ],
+
+      avoid: [
+        "🍟 Deep fried snacks",
+        "🥤 Sugary drinks"
+      ]
+    };
+  }
+
+  if (healthScore >= 60) {
+    return {
+      title: "🥗 Healthy Choice",
+      color: "blue",
+      message:
+        "Generally safe to consume, but maintain a balanced diet.",
+
+      eat: [
+        "🥦 Green vegetables",
+        "🍗 Protein-rich foods",
+        "🥜 Nuts"
+      ],
+
+      avoid: [
+        "🍬 Excess sweets",
+        "🍕 Too much fast food"
+      ]
+    };
+  }
+
+  if (healthScore >= 40) {
+    return {
+      title: "⚠ Consume Occasionally",
+      color: "yellow",
+      message:
+        "Consume occasionally and balance it with nutritious foods.",
+
+      eat: [
+        "🥗 Salad",
+        "🍉 Fruits",
+        "💧 Plenty of water"
+      ],
+
+      avoid: [
+        "🍔 Junk food",
+        "🍟 Chips"
+      ]
+    };
+  }
+
+  return {
+    title: "🚫 Better to Avoid",
+    color: "red",
+    message:
+      "Choose healthier alternatives whenever possible.",
+
+    eat: [
+      "🥬 Vegetables",
+      "🍎 Fruits",
+      "🥣 Homemade meals"
+    ],
+
+    avoid: [
+      "🥤 Soft drinks",
+      "🍩 Processed snacks"
+    ]
+  };
+
+};
+
+const healthTip = getHealthTip();
+
+const uniqueIngredients = [
+  ...new Map(
+    ingredientAnalysis.map(item => [item.simpleTerm.toLowerCase(), item])
+  ).values()
+];
+
+const visibleIngredients = showAllIngredients
+  ? uniqueIngredients
+  : uniqueIngredients.slice(0, 8);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-100 to-cyan-50 pb-12">
@@ -172,6 +296,62 @@ function Result() {
 
       <div className="max-w-7xl mx-auto px-6 mt-8 space-y-8">
 
+      <motion.div
+  initial={{ opacity: 0, y: 40 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.3 }}
+  className="bg-white rounded-3xl shadow-xl p-8"
+>
+
+  <h2 className="text-3xl font-bold mb-4">
+    💚 Personalized Health Tip
+  </h2>
+
+  <h3 className="text-xl font-semibold text-green-700 mb-3">
+    {healthTip.title}
+  </h3>
+
+  <p className="text-gray-700 leading-7 mb-6">
+    {healthTip.message}
+  </p>
+
+  <div className="grid md:grid-cols-2 gap-6">
+
+    <div>
+
+      <h4 className="font-bold mb-3">
+        ✅ Eat More
+      </h4>
+
+      {healthTip.eat.map((item) => (
+
+        <p key={item} className="mb-2">
+          {item}
+        </p>
+
+      ))}
+
+    </div>
+
+    <div>
+
+      <h4 className="font-bold mb-3 text-red-600">
+        🚫 Limit
+      </h4>
+
+      {healthTip.avoid.map((item) => (
+
+        <p key={item} className="mb-2">
+          {item}
+        </p>
+
+      ))}
+
+    </div>
+
+  </div>
+
+</motion.div>
         {/* AI Summary */}
 
         <motion.div
@@ -262,59 +442,57 @@ function Result() {
 
         </motion.div>
 
-        {/* Ingredient Analysis */}
+      {/* Ingredient Analysis */}
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="bg-white rounded-3xl shadow-xl p-8"
-        >
+<motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ delay: 0.7 }}
+  className="bg-white rounded-3xl shadow-xl p-8"
+>
+  <h2 className="text-3xl font-bold mb-8">
+    🧪 Ingredient Analysis
+  </h2>
 
-          <h2 className="text-3xl font-bold mb-8">
-            🧪 Ingredient Analysis
-          </h2>
+  <div className="space-y-4">
+    {visibleIngredients.map((item, index) => (
+      <div
+        key={index}
+        onClick={() => openIngredient(item.ingredient)}
+        className="bg-slate-50 rounded-xl p-4 cursor-pointer hover:bg-blue-50 transition"
+      >
+        <div className="flex items-start gap-3">
+          <span className="text-xl">
+            {item.status ? "🟢" : "🔴"}
+          </span>
 
-          <div className="space-y-4">
+          <div>
+            <h3 className="font-semibold">
+              {item.simpleTerm}
+            </h3>
 
-            {ingredientAnalysis.map((item, index) => (
-
-              <div
-                key={index}
-                className="flex justify-between items-center bg-slate-50 rounded-xl p-5"
-              >
-
-                <div>
-
-                  <p className="font-bold text-lg">
-                    {item.ingredient}
-                  </p>
-
-                  <p className="text-gray-500">
-                    {item.simpleTerm}
-                  </p>
-
-                </div>
-
-                <span
-                  className={`px-5 py-2 rounded-full font-bold ${
-                    item.status
-                      ? "bg-red-100 text-red-700"
-                      : "bg-green-100 text-green-700"
-                  }`}
-                >
-                  {item.status ? "Unsafe" : "Safe"}
-                </span>
-
-              </div>
-
-            ))}
-
+            <p className="text-gray-500 text-sm">
+              {item.ingredient}
+            </p>
           </div>
+        </div>
+      </div>
+    ))}
 
-        </motion.div>
-
-        {/* Nutrition */}
+    {uniqueIngredients.length > 8 && (
+      <div className="text-center mt-5">
+        <button
+          onClick={() => setShowAllIngredients(!showAllIngredients)}
+          className="text-blue-600 font-semibold hover:underline"
+        >
+          {showAllIngredients
+            ? "Show Less"
+            : `View All (${uniqueIngredients.length})`}
+        </button>
+      </div>
+    )}
+  </div>
+</motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -399,7 +577,105 @@ function Result() {
 
         </motion.div>
 
-      </div>
+           </div>
+
+      {modalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+          <div className="bg-white rounded-3xl shadow-2xl p-8 w-[90%] max-w-xl">
+
+            <div className="flex justify-between items-center mb-5">
+
+              <h2 className="text-2xl font-bold">
+                🧪 {selectedIngredient}
+              </h2>
+
+              <button
+                onClick={() => setModalOpen(false)}
+                className="text-2xl font-bold text-gray-500 hover:text-red-500"
+              >
+                ×
+              </button>
+
+            </div>
+
+            {loadingIngredient ? (
+
+              <p className="text-gray-600">
+                🤖 AI is explaining this ingredient...
+              </p>
+
+            ) : (
+
+              <div className="space-y-6">
+
+  <div>
+    <h3 className="font-bold text-lg mb-2">
+      📖 Description
+    </h3>
+
+    <p className="text-gray-700">
+      {ingredientInfo?.description}
+    </p>
+  </div>
+
+  <div>
+    <h3 className="font-bold text-lg mb-2">
+      🍜 Common Uses
+    </h3>
+
+    <ul className="list-disc pl-6 space-y-1">
+
+      {ingredientInfo?.commonUses?.map((item) => (
+
+        <li key={item}>
+          {item}
+        </li>
+
+      ))}
+
+    </ul>
+  </div>
+
+  <div>
+    <h3 className="font-bold text-lg mb-2">
+      ⚠ Allergy Warnings
+    </h3>
+
+    <div className="flex flex-wrap gap-2">
+
+      {ingredientInfo?.allergyWarnings?.map((item) => (
+
+        <span
+          key={item}
+          className="bg-red-100 text-red-700 px-3 py-1 rounded-full"
+        >
+          {item}
+        </span>
+
+      ))}
+
+    </div>
+  </div>
+
+  <div>
+    <h3 className="font-bold text-lg mb-2">
+      💡 Recommendation
+    </h3>
+
+    <p className="text-gray-700">
+      {ingredientInfo?.recommendation}
+    </p>
+  </div>
+
+</div>
+
+            )}
+
+          </div>
+
+        </div>
+      )}
 
     </div>
   );

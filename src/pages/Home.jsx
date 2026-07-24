@@ -40,7 +40,9 @@ const analyzeProduct = async () => {
       },
     });
 
-    console.log(response.data);
+    console.log("FULL RESPONSE");
+console.log(response.data);
+console.log("Ingredient Analysis:", response.data.ingredientAnalysis);
 
     navigate("/result", {
   state: response.data,
