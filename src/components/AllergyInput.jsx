@@ -30,7 +30,7 @@ function AllergyInput({ allergies, setAllergies }) {
         Allergies
       </h2>
 
-      <div className="flex justify-center gap-3">
+      <div className="flex flex-col sm:flex-row justify-center gap-3">
 
         <input
           value={value}
@@ -43,7 +43,7 @@ function AllergyInput({ allergies, setAllergies }) {
           placeholder="Enter allergy..."
           className="
 w-full
-max-w-md
+sm:max-w-md
 px-5
 py-2
 rounded-xl
@@ -54,17 +54,20 @@ text-base
         />
 
         <button
-          onClick={addAllergy}
-          className="
-          bg-blue-800
-          text-white
-          px-8
-          rounded-xl
-          hover:bg-blue-900
-          "
-        >
-          Add
-        </button>
+  onClick={addAllergy}
+  className="
+    w-full
+    sm:w-auto
+    bg-blue-800
+    text-white
+    px-8
+    py-3
+    rounded-xl
+    hover:bg-blue-900
+  "
+>
+  Add
+</button>
 
       </div>
 
