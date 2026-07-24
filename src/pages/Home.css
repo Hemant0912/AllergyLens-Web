@@ -1,0 +1,27 @@
+body {
+  margin: 0;
+  background: #f5f7fb;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.home {
+  max-width: 1200px;
+  margin: auto;
+  padding: 40px;
+  text-align: center;
+}
+
+.logo {
+  width: 80px;
+}
+
+.title {
+  color: #19489E;
+  font-size: 56px;
+  margin-top: 15px;
+}
+
+.subtitle {
+  color: gray;
+  font-size: 24px;
+}
