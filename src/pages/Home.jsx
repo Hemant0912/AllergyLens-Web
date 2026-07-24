@@ -5,11 +5,13 @@ import AllergyInput from "../components/AllergyInput";
 import { useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 import FoodBot from "../components/FoodBot";
 
 function Home() {
 
   const navigate = useNavigate();
+  const { darkMode, toggleTheme } = useTheme();
   const [images, setImages] = useState([]);
   const [allergies, setAllergies] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -70,16 +72,24 @@ console.log("Ingredient Analysis:", response.data.ingredientAnalysis);
 };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-100 to-cyan-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-100 to-cyan-50 dark:from-slate-900 dark:via-slate-950 dark:to-black transition-colors duration-300 relative overflow-hidden">
     <div className="absolute top-20 left-20 w-72 h-72 bg-blue-300 rounded-full blur-[140px] opacity-30"></div>
     <div className="absolute bottom-20 right-20 w-80 h-80 bg-cyan-300 rounded-full blur-[150px] opacity-30"></div>
 
       <motion.div
-        initial={{ opacity: 0, y: -40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        className="pt-4 text-center"
-      >
+  initial={{ opacity: 0, y: -40 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.7 }}
+  className="pt-4 relative text-center"
+>
+
+  <button
+    onClick={toggleTheme}
+    className="absolute top-4 right-8 text-2xl"
+    title="Toggle Theme"
+  >
+    {darkMode ? "☀️" : "🌙"}
+  </button>
 
         <img
           src={logo}
@@ -87,11 +97,11 @@ console.log("Ingredient Analysis:", response.data.ingredientAnalysis);
           className="w-12 mx-auto"
         />
 
-        <h1 className="text-4xl font-bold text-blue-900 mt-4">
+        <h1 className="text-4xl font-bold text-blue-900 dark:text-white mt-4 transition-colors">
           AllergyLens
         </h1>
 
-        <p className="text-base text-gray-500 mt-2">
+       <p className="text-base text-gray-500 dark:text-gray-400 mt-2 transition-colors">
           AI Powered Food Safety Scanner
         </p>
 
@@ -129,7 +139,7 @@ console.log("Ingredient Analysis:", response.data.ingredientAnalysis);
 
 </div>
 
-<footer className="mt-10 border-t border-slate-200 bg-white/40 backdrop-blur-sm">
+<footer className="mt-10 border-t border-slate-200 dark:border-slate-700 bg-white/40 dark:bg-slate-900/70 backdrop-blur-sm transition-colors">
 
   <div className="max-w-6xl mx-auto py-6 text-center">
 
@@ -145,9 +155,7 @@ console.log("Ingredient Analysis:", response.data.ingredientAnalysis);
       © {new Date().getFullYear()} AllergyLens. All Rights Reserved.
     </p>
 
-    <p className="text-sm text-gray-500">
-      Built with ❤️ using React • Spring Boot • Gemini AI
-    </p>
+    
 
   </div>
 

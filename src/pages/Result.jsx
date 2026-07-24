@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { explainIngredient } from "../services/ingredientApi";
+import { useTheme } from "../context/ThemeContext";
 import {
   FaArrowLeft,
   FaShieldAlt,
@@ -22,7 +23,7 @@ const [modalOpen, setModalOpen] = useState(false);
 const [ingredientInfo, setIngredientInfo] = useState(null);
 const [loadingIngredient, setLoadingIngredient] = useState(false);
 const [showAllIngredients, setShowAllIngredients] = useState(false);
-
+const { darkMode, toggleTheme } = useTheme();
   if (!state) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100">
@@ -167,25 +168,38 @@ const visibleIngredients = showAllIngredients
   ? uniqueIngredients
   : uniqueIngredients.slice(0, 8);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-100 to-cyan-50 pb-12">
+ return (
+  <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-100 to-cyan-50 dark:from-slate-900 dark:via-slate-950 dark:to-black transition-colors duration-300 relative pb-12">
 
-      {/* Header */}
+    {/* Header */}
 
       <motion.div
-        initial={{ y: -40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="max-w-7xl mx-auto px-6 pt-10"
-      >
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-blue-700 hover:text-blue-900 font-medium"
-        >
-          <FaArrowLeft />
-          Scan Another Product
-        </button>
+  initial={{ y: -40, opacity: 0 }}
+  animate={{ y: 0, opacity: 1 }}
+  className="max-w-7xl mx-auto px-6 pt-10"
+>
 
-        <h1 className="text-5xl font-bold text-blue-900 mt-6">
+  <div className="flex justify-between items-start">
+
+    <button
+      onClick={() => navigate("/")}
+      className="flex items-center gap-2 text-blue-700 dark:text-blue-400 hover:text-blue-900 font-medium"
+    >
+      <FaArrowLeft />
+      Scan Another Product
+    </button>
+
+    <button
+      onClick={toggleTheme}
+      className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full p-3 shadow-lg hover:scale-105 transition"
+      title="Toggle Theme"
+    >
+      {darkMode ? "☀️" : "🌙"}
+    </button>
+
+  </div>
+         
+        <h1 className="text-5xl font-bold text-blue-900 dark:text-white mt-6 transition-colors">
           {productName}
         </h1>
       </motion.div>
